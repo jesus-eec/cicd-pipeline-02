@@ -1,0 +1,135 @@
+trigger:
+- main
+
+pool:
+  name: Default
+
+stages:
+  - stage: BuildDev
+    displayName: Stage Build for Dev
+    jobs:
+    - deployment: BuildMobileApp
+      displayName: Build for Mobile App for Dev
+      environment: development
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - script: echo 'Building Mobile Application for Dev'
+              displayName: Step Building Mobile App for Dev
+            - script: echo 'Running Unit Test for Dev'
+              displayName: Step Running Unit Test for Dev
+    - deployment: BuildReactApp
+      displayName: Build for React App for Dev
+      environment: development
+      dependsOn: BuildMobileApp
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - script: echo 'Building React App for Dev'
+              displayName: Step Building React App for Dev
+            - script: echo 'Running Unit Test for Dev'
+              displayName: Step Running Unit Test for Dev
+    - deployment: BuildNodeApp
+      displayName: Build for Node App for Dev
+      environment: development
+      dependsOn:
+      - BuildMobileApp
+      - BuildReactApp
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - script: echo 'Building Node App for Dev'
+              displayName: Step Building Node App for Dev
+            - script: echo 'Running Unit Test for Node App in Dev'
+              displayName: Step Running Unit Test for Node App in Dev
+  
+  - stage: BuildStaging
+    displayName: Stage Build for Staging
+    dependsOn: BuildDev
+    condition: succeeded('BuildDev')
+    jobs:
+    - deployment: BuildMobileApp
+      displayName: Build for Mobile App for Staging
+      environment: staging
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - script: echo 'Building Mobile App for Staging'
+              displayName: Step Building Mobile App for Staging
+            - script: echo 'Running Unit Test for Staging'
+              displayName: Step Running Unit Test for Staging
+    - deployment: BuildReactApp
+      displayName: Build for React App for Staging
+      environment: staging
+      dependsOn: BuildMobileApp
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - script: echo 'Building React App for Staging'
+              displayName: Step Building React App for Staging
+            - script: echo 'Running Unit Test for Staging'
+              displayName: Step Running Unit Test for Staging
+    - deployment: BuildNodeApp
+      displayName: Build for Node App for Staging
+      environment: staging
+      dependsOn:
+      - BuildMobileApp
+      - BuildReactApp
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - script: echo 'Building Node App for Staging'
+              displayName: Step Building Node App for Staging
+            - script: echo 'Running Unit Test for Staging'
+              displayName: Step Running Unit Test for Staging
+  
+  - stage: BuildPro
+    displayName: Stage Build for Production
+    dependsOn: 
+    - BuildDev
+    - BuildStaging
+    condition: and(succeeded('BuildDev'), succeeded('BuildStaging'))
+    jobs:
+    - deployment: BuildMobileApp
+      displayName: Build for Mobile App for Production
+      environment: production
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - script: echo 'Building Mobile App for Production'
+              displayName: Step Building Mobile App for Production
+            - script: echo 'Running Unit Test for Production'
+              displayName: Step Running Unit Test for Production
+    - deployment: BuildReactApp
+      displayName: Build for React App for Production
+      environment: production
+      dependsOn: BuildMobileApp
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - script: echo 'Building React App for Production'
+              displayName: Step Building React App for Production
+            - script: echo 'Running Unit Test for Production'
+              displayName: Step Running Unit Test for Production
+    - deployment: BuildNodeApp
+      displayName: Build for Node App for Production
+      environment: production
+      dependsOn:
+      - BuildMobileApp
+      - BuildReactApp
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - script: echo 'Building Node App for Production'
+              displayName: Step Building Node App for Production
+            - script: echo 'Running Unit Test for Production'
+              displayName: Step Running Unit Test for Production
